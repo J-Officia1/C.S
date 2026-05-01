@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cipher Quest - Jerries Lab</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Global Security & Constraints */
+        * {
+            user-select: none;
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            cursor: default !important;
+        }
+
+        input,
+        button {
+            user-select: auto !important;
+            -webkit-user-select: auto !important;
+            cursor: text !important;
+        }
+
+        button {
+            cursor: pointer !important;
+        }
+
+        /* Thematic Protection Overlay */
+        #protected-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0d1117;
+            display: none;
+            z-index: 99999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+            text-align: center;
+        }
+
+        .jerry-glitch-msg {
+            font-family: 'JetBrains Mono', monospace;
+            color: #ff3e3e;
+            font-size: 2.5rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0px #00ffcc;
+            animation: text-shake 0.1s infinite alternate;
+            margin-bottom: 2rem;
+        }
+
+        .thematic-no-btn {
+            background: #fff9c4;
+            color: #111;
+            border: 2px solid #333;
+            padding: 15px 40px;
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 900;
+            font-size: 1.2rem;
+            box-shadow: 8px 8px 0px #ff3e3e;
+            transform: rotate(-5deg);
+            cursor: pointer !important;
+            transition: 0.1s;
+        }
+
+        @keyframes text-shake {
+            0% {
+                transform: translate(1px, 1px) rotate(0.1deg);
+            }
+
+            100% {
+                transform: translate(-1px, -1px) rotate(-0.1deg);
+            }
+        }
+
+        /* Interactive Note Paper Physics Styling */
+        #note-container {
+            position: fixed;
+            top: -500px;
+            right: 80px;
+            z-index: 5000;
+            transition: top 1s cubic-bezier(0.25, 0.1, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        #note-paper {
+            width: 310px;
+            min-height: 260px;
+            background: #fff9c4;
+            padding: 2.2rem;
+            box-shadow: 2px 15px 45px rgba(0, 0, 0, 0.7);
+            border: 1px solid #fbc02d;
+            transform-origin: top center;
+            position: relative;
+            cursor: pointer !important;
+            color: #111;
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .cipher-text {
+            word-break: break-all;
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: #000;
+            display: none;
+            opacity: 0;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 12px;
+            border: 1px dashed #ccc;
+        }
+
+        .copy-btn {
+            background: transparent;
+            color: #333;
+            border: 2px solid #333;
+            padding: 6px 14px;
+            font-size: 0.75rem;
+            font-weight: 800;
+            display: none;
+            text-transform: uppercase;
+            box-shadow: 2px 2px 0px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Ghost Typing Interaction (Floating at Cursor) */
+        .numeric-ghost {
+            position: fixed;
+            pointer-events: none;
+            color: rgba(0, 255, 204, 0.6);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 18px;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;">
+
+    <div id="protected-overlay">
+        <div class="jerry-glitch-msg">DID YOU LEAVE JERRY? ALREADY?!!</div>
+        <button class="thematic-no-btn" onclick="hideProtection()">NOOOO JERRY!!</button>
+    </div>
+
+    <div id="note-container">
+        <div id="tape"
+            style="width: 90px; height: 35px; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(4px); cursor: pointer !important; z-index: 5001; margin-bottom: -18px;"
+            onclick="weakenTape()"></div>
+        <div id="note-paper" onclick="revealCipher()">
+            <div id="note-content">
+                <p class="note-instruction" style="font-weight:bold; font-style:italic;">[ CLICK TO UNFOLD MEMO ]</p>
+                <div class="cipher-text" id="cipher-box">MXR3bzNmb3VyNXNpeA==</div>
+                <button class="copy-btn" id="copy-btn" onclick="copyCipher(event)">COPY DATA</button>
+            </div>
+        </div>
+    </div>
+
+    <nav>
+        <div class="nav-links"><a href="#" class="active"><i class="fas fa-terminal"
+                    style="color: #00ffcc; margin-right: 0.5rem;"></i>Jerries Lab</a></div>
+        <div class="nav-icons"><i class="fas fa-moon" style="align-self: center; cursor: pointer !important;"></i></div>
+    </nav>
+
+    <main>
+        <div class="challenge-container" id="challenge-box">
+            <div class="challenge-header">
+                <div class="tab">JERRIES_LAB_ACCESS.LOG</div>
+            </div>
+            <div class="challenge-body">
+                <h1 class="challenge-title">Jerry's OCD Test</h1>
+                <div class="description">
+                    <p><b>LOG ENTRY 64.3:</b> I've been stuck in this <b>base</b>ment for <b>64</b> hours. My head is
+                        spinning with sequences. I tried to save the team flag, but the formatting kept messing up. </p>
+                    <br>
+                    <p>I left the raw data in the memo below. One last warning: I'm a perfectionist. Whatever you
+                        decode, it's probably messy. The final flag MUST be <b>OCD free</b> before you submit it.</p>
+                </div>
+                <div class="download-section"><button class="file-btn"
+                        style="background:#3b4252; color:white; border:none; padding:10px 20px; border-radius:8px; cursor:pointer !important;"
+                        onclick="dropNote()"><i class="fas fa-sticky-note"></i> open_jerry_memo.txt</button></div>
+                <div class="submission-form" style="display:flex; gap:10px; margin-top:20px;">
+                    <input type="text" id="flag-input" placeholder="MY PATTERN!!!"
+                        style="background:#0d1117; color:#00ffcc; border:1px solid #30363d; padding:10px; border-radius:8px; flex:1;">
+                    <button class="submit-btn"
+                        style="background:#00ffcc; color:#080a0f; border:none; padding:0 20px; border-radius:8px; font-weight:bold; cursor:pointer !important;"
+                        onclick="checkFlag()">SUBMIT</button>
+                </div>
+                <input type="text" id="result" readonly
+                    style="margin-top:1rem; font-size:0.85rem; font-weight:bold; background:#0d1117; border:1px solid #30363d; padding:10px; border-radius:8px; width:100%; cursor:text !important;">
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const challengeBox = document.getElementById('challenge-box');
+        const overlay = document.getElementById('protected-overlay');
+        const noteContainer = document.getElementById('note-container');
+        const notePaper = document.getElementById('note-paper');
+        const tape = document.getElementById('tape');
+        const cipherBox = document.getElementById('cipher-box');
+        const copyBtn = document.getElementById('copy-btn');
+        const noteInstr = document.querySelector('.note-instruction');
+
+        let isTyping = false, noteDropped = false, tapeStrength = 3, isFallen = false;
+
+        function showProtection() { overlay.style.display = 'flex'; }
+        function hideProtection() { overlay.style.display = 'none'; }
+
+        // --- Pendulum Physics (Reduced by 70%) ---
+        let angle = 0, angleVel = 0, angleAccel = 0, targetAngle = 0, dampening = 0.95;
+
+        notePaper.addEventListener('mousemove', (e) => {
+            if (!noteDropped || isFallen) return;
+            const rect = notePaper.getBoundingClientRect();
+            const noteCenterX = rect.left + rect.width / 2;
+            // REDUCED FORCE (from 45 to 13)
+            targetAngle = ((e.clientX - noteCenterX) / rect.width) * 13;
+        });
+
+        notePaper.addEventListener('mouseleave', () => { targetAngle = 0; });
+
+        function updatePhysics() {
+            if (!isFallen) {
+                angleAccel = (targetAngle - angle) * 0.01;
+                angleVel = (angleVel + angleAccel) * dampening;
+                angle += angleVel;
+                notePaper.style.transform = `rotate(${angle}deg)`;
+            }
+            requestAnimationFrame(updatePhysics);
+        }
+        updatePhysics();
+
+        function dropNote() { noteDropped = true; noteContainer.style.top = "100px"; }
+        function revealCipher() {
+            noteInstr.style.display = 'none';
+            cipherBox.style.display = 'block';
+            copyBtn.style.display = 'inline-block';
+            setTimeout(() => cipherBox.style.opacity = "1", 50);
+        }
+
+        function weakenTape() {
+            if (isFallen) return;
+            tapeStrength--;
+            tape.style.opacity = (tapeStrength / 3) + 0.2;
+            angleVel += 5; // Reduced click impact
+            if (tapeStrength <= 0) fallDown();
+        }
+
+        function fallDown() {
+            isFallen = true;
+            tape.style.display = 'none';
+            noteContainer.style.top = (window.innerHeight - 300) + "px";
+            noteContainer.style.right = "80px";
+            noteContainer.style.transform = "rotate(2deg)";
+        }
+
+        function copyCipher(e) {
+            e.stopPropagation();
+            navigator.clipboard.writeText(cipherBox.innerText).then(() => {
+                const old = copyBtn.textContent;
+                copyBtn.textContent = "DONE!";
+                setTimeout(() => copyBtn.textContent = old, 1500);
+            });
+        }
+
+        // --- Security & UI ---
+        document.addEventListener('copy', (e) => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
+        document.addEventListener('cut', (e) => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
+        document.addEventListener('paste', (e) => { if (e.target.tagName !== 'INPUT') e.preventDefault(); });
+
+        window.addEventListener('keydown', (e) => { if (e.key === "PrintScreen" || (e.shiftKey && e.metaKey && e.key === "S")) showProtection(); });
+        window.addEventListener('blur', showProtection);
+
+        // --- FIXED: FOLLOW CURSOR CORRECTLY ---
+        window.addEventListener('mousedown', (e) => {
+            if (isTyping) return;
+
+            // Check if clicking the UI elements
+            if ((noteDropped && e.target.closest('#note-paper')) || e.target.closest('#tape') || e.target.closest('.challenge-container')) return;
+
+            isTyping = true;
+            createTypingGhost(e.clientX, e.clientY);
+        });
+
+        function createTypingGhost(x, y) {
+            const g = document.createElement('div');
+            g.className = 'numeric-ghost';
+            g.style.left = `${x}px`;
+            g.style.top = `${y}px`;
+            const s = document.createElement('span');
+            g.appendChild(s);
+            document.body.appendChild(g);
+
+            requestAnimationFrame(() => g.style.opacity = '1');
+
+            const seq = "1 2 3 4 5 6 . . . . .";
+            let i = 0;
+            const t = setInterval(() => {
+                if (i < seq.length) s.textContent += seq[i++];
+                else {
+                    clearInterval(t);
+                    setTimeout(() => {
+                        const d = setInterval(() => {
+                            if (s.textContent.length > 0) s.textContent = s.textContent.slice(0, -1);
+                            else { clearInterval(d); g.style.opacity = '0'; setTimeout(() => { g.remove(); isTyping = false; }, 300); }
+                        }, 25);
+                    }, 500);
+                }
+            }, 80);
+        }
+
+        // --- SECURE FLAG VALIDATION (no plaintext flag or answer in source) ---
+        // Flag: cipherQUEST{jerryhasocdfr} XOR-encrypted with the correct key
+        const _enc = [82, 29, 7, 7, 86, 20, 62, 32, 55, 102, 39, 18, 18, 84, 6, 5, 22, 91, 7, 28, 26, 17, 81, 21, 27, 5];
+        // SHA-256 hash of the correct answer (never reveals the answer itself)
+        const _correctHash = "a4ec0231a94a18195a4476f9a9e2629d55b9498f88a06581e35eef237a56bb3d";
+
+        async function sha256(message) {
+            const msgBuffer = new TextEncoder().encode(message);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        function xorDecrypt(encBytes, key) {
+            let result = '';
+            for (let i = 0; i < encBytes.length; i++) {
+                result += String.fromCharCode(encBytes[i] ^ key.charCodeAt(i % key.length));
+            }
+            return result;
+        }
+
+        // Known wrong pattern (OCD broken) — just a hash comparison, no string in source
+        const _wrongHash = "6789b2590b2ba154c44d95535d67ea449de49378a7e61a394dc7a43aee1e43f2";
+
+        async function checkFlag() {
+            const input = document.getElementById('flag-input');
+            const val = input.value.trim();
+            const res = document.getElementById('result');
+
+            res.style.color = "";
+            res.value = "";
+
+            const inputHash = await sha256(val);
+
+            if (inputHash === _correctHash) {
+                // Decrypt the flag at runtime — plaintext never exists in source
+                const flag = xorDecrypt(_enc, val);
+                res.value = "YES! Jerry is finally happy! Your flag is: " + flag;
+                res.style.color = "#00ffcc";
+                input.style.borderColor = "#00ffcc";
+                input.style.color = "#00ffcc";
+            }
+            else if (inputHash === _wrongHash) {
+                res.value = "The pattern is wrong! This triggers Jerry's OCD. Think harder.";
+                res.style.color = "#ffcc00";
+                input.style.borderColor = "#ffcc00";
+                input.style.color = "#ffcc00";
+            }
+            else {
+                res.value = "Invalid data format. Are you sure you decoded it properly?";
+                res.style.color = "#ff3e3e";
+                input.style.borderColor = "#ff3e3e";
+                input.style.color = "#ff3e3e";
+                input.style.transform = "translateX(5px)";
+                setTimeout(() => input.style.transform = "translateX(-5px)", 50);
+                setTimeout(() => input.style.transform = "translateX(5px)", 100);
+                setTimeout(() => input.style.transform = "translateX(0)", 150);
+            }
+        }
+
+        document.getElementById('flag-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') checkFlag();
+        });
+    </script>
+</body>
+
+</html>

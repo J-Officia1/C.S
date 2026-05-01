@@ -1,0 +1,5 @@
+Our agents intercepted a surveillance frame transmitted from a compromised server room. 
+The attacker embedded an authentication token inside the image and scrambled it before sending. 
+No instructions were left behind — only the image.
+
+Inspect the file. Read everything. The clues are there if you know what to look for.

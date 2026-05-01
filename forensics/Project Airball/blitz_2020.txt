@@ -1,0 +1,29 @@
+[TIMESTAMP: 2020-04-29T23:59:59Z]
+[RELAY: BERLIN-NODE-09]
+[PROTOCOL: ENIGMA-TCP]
+
+ID_771: Initiating handshake...
+ID_771: Sent packet -> flag{H41L_TH3_FUHR3R_999}
+SYSTEM: WARNING! Packet ID_771 is a decoy.
+
+ID_882: SECURE_COMM_START
+DATA: SGVsbG8sIFdlIGF0dGFjayBhdCBkYXduLg==
+ID_882: PART_1_COORD -> flag{49.2785_N}
+
+ID_903: ERROR_FILE_NOT_FOUND
+ID_903: Recovery string -> "V2lyIG11c3NlbiBzaWVnZW4="
+ID_903: LOG_COMMENT: "The coordinates are split for security."
+
+ID_441: INCOMING_MESSAGE
+MESSAGE: flag{ST4Y_LOY4L_TO_TH3_R3ICH}
+SYSTEM: ALERT! Unauthorized user detected. Purging decoys...
+
+ID_552: PART_2_COORD -> flag{128.6015_E}
+
+ID_229: MEMORY_DUMP_START
+0000010: 48 61 69 6c 20 48 69 74 6c 65 72    Hail Hitler
+0000020: 5a 6d 78 68 Z3 tz dG h0 Xz E4 Xz B   <-- DATA CORRUPTED
+ID_229: PART_3_COORD -> flag{_ALT_2500M}
+
+ID_111: SESSION_CLOSED.
+FINAL_MSG: "The world will tremble in 2020."

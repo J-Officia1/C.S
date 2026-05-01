@@ -1,0 +1,4 @@
+Hint 1
+Images store more than just pixels.
+Use a metadata reader tool on the PNG file.
+
